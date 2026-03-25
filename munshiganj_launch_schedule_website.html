@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Munshiganj Launch Schedule</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;transition: all 0.3s ease;}
+body{background:#eef5ff;}
+
+header{background:linear-gradient(135deg,#0b5ed7,#0dcaf0);color:#fff;padding:20px;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,0.2);}
+header h1{animation: fadeInDown 1s ease;}
+header p{animation: fadeInUp 1s ease;}
+
+@keyframes fadeInDown {
+  0%{opacity:0; transform: translateY(-20px);}
+  100%{opacity:1; transform: translateY(0);}
+}
+@keyframes fadeInUp {
+  0%{opacity:0; transform: translateY(20px);}
+  100%{opacity:1; transform: translateY(0);}
+}
+
+nav{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;background:#fff;padding:10px;position:sticky;top:0;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+nav a{color:#0b5ed7;text-decoration:none;font-weight:600;cursor:pointer;transition:0.3s;}
+nav a:hover{color:#0dcaf0;}
+
+.container{max-width:1100px;margin:auto;padding:15px;}
+
+.search-box{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;}
+
+input,select,button{padding:12px;border-radius:10px;border:1px solid #ddd;flex:1;transition:0.3s;}
+input:focus, select:focus{border-color:#0dcaf0; outline:none;}
+button{background:#0b5ed7;color:#fff;border:none;cursor:pointer;box-shadow:0 3px 6px rgba(0,0,0,0.1);}
+button:hover{background:#0dcaf0;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;}
+
+.card{background:#fff;padding:20px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);transition: transform 0.3s, box-shadow 0.3s;}
+.card:hover{transform: translateY(-5px);box-shadow:0 10px 20px rgba(0,0,0,0.15);}
+.card h4{color:#0b5ed7;margin-bottom:8px;}
+.card p{margin-bottom:5px;}
+
+.alert{background:#fff3cd;color:#856404;padding:12px;border-radius:10px;margin-bottom:15px;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+
+footer{
+  background:#0b5ed7;
+  color:white;
+  text-align:center;
+  padding:20px;
+  margin-top:30px;
+  transition: background 0.3s;
+}
+footer:hover{background:#0dcaf0;}
+
+.hidden{display:none;}
+
+@media(max-width:600px){
+  input,select,button{width:100%;}
+  .search-box{flex-direction:column;}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Munshiganj Launch Schedule</h1>
+<p>সহজে লঞ্চের সময়সূচী খুঁজুন</p>
+</header>
+
+<nav>
+<a onclick="showPage('home')">Home</a>
+<a onclick="showPage('schedule')">Schedule</a>
+</nav>
+
+<!-- HOME -->
+<div class="container" id="home">
+<div class="search-box">
+<select id="from">
+<option value="">--Select From--</option>
+<option value="Munshiganj">Munshiganj</option>
+<option value="Dhaka">Dhaka</option>
+<option value="Chandpur">Chandpur</option>
+<option value="Barisal">Barisal</option>
+</select>
+<select id="to">
+<option value="">--Select To--</option>
+<option value="Dhaka">Dhaka</option>
+<option value="Chandpur">Chandpur</option>
+<option value="Barisal">Barisal</option>
+<option value="Munshiganj">Munshiganj</option>
+</select>
+<select id="filter" onchange="filterSchedule()">
+<option value="all">All</option>
+<option value="Dhaka">Dhaka</option>
+<option value="Chandpur">Chandpur</option>
+<option value="Barisal">Barisal</option>
+</select>
+<button onclick="searchLaunch()">Search</button>
+</div>
+<div class="alert">⚠️ আবহাওয়া খারাপ হলে লঞ্চ দেরি হতে পারে</div>
+<h3>All Launch Schedule</h3>
+<div id="list" class="grid"></div>
+</div>
+
+<!-- SCHEDULE PAGE -->
+<div class="container hidden" id="schedule">
+<h2>All Launch Times</h2>
+<div id="scheduleList" class="grid"></div>
+</div>
+
+<!-- LOGIN -->
+<div class="container hidden" id="login">
+<h2>Admin Login</h2>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="container hidden" id="admin">
+<h2>Admin Panel</h2>
+<input id="name" placeholder="Launch Name">
+<select id="fromSelect"></select>
+<select id="dest"></select>
+<select id="categorySelect"></select>
+<input id="newCategory" placeholder="Add New Category">
+<button onclick="addCategory()">Add Category</button>
+<input id="time" placeholder="Time">
+<input id="arrival" placeholder="Arrival Time">
+<button onclick="addLaunch()">Add Launch</button>
+<h3>Manage Launch</h3>
+<div id="adminList" class="grid"></div>
+<h3>Footer & Admin Settings</h3>
+<input id="footerTextInput" placeholder="Footer Text">
+<button onclick="updateFooter()">Update Footer</button>
+<h4>Change Admin Login</h4>
+<input id="newUsername" placeholder="New Username">
+<input id="newPassword" placeholder="New Password">
+<button onclick="changeAdmin()">Update Login</button>
+</div>
+
+<!-- FOOTER -->
+<footer>
+<p id="footerText">Website designed by <span style="cursor:pointer;" onclick="showPage('login')">Zihad Wazeer</span></p>
+</footer>
+
+<script>
+let ADMIN_USER = "Adminzihad";
+let ADMIN_PASS = "admin123";
+
+let categories = ["Express","Local"];
+let locations = ["Munshiganj","Dhaka","Chandpur","Barisal"];
+
+let launches = [
+  {id:1,name:"MV Padma Express", from:"Munshiganj", to:"Dhaka", category:"Express", time:"07:30 AM", arrival:"09:30 AM"},
+  {id:2,name:"MV Meghna Star", from:"Munshiganj", to:"Chandpur", category:"Local", time:"10:00 AM", arrival:"12:30 PM"},
+  {id:3,name:"MV Barisal Queen", from:"Munshiganj", to:"Barisal", category:"Express", time:"06:00 PM", arrival:"11:00 PM"}
+];
+
+function populateDropdowns(){
+  let fromSel=document.getElementById('fromSelect');
+  let destSel=document.getElementById('dest');
+  let catSel=document.getElementById('categorySelect');
+  fromSel.innerHTML=''; destSel.innerHTML=''; catSel.innerHTML='';
+  locations.forEach(l=>{
+    fromSel.innerHTML+=`<option value='${l}'>${l}</option>`;
+    destSel.innerHTML+=`<option value='${l}'>${l}</option>`;
+  });
+  categories.forEach(c=>{
+    catSel.innerHTML+=`<option value='${c}'>${c}</option>`;
+  });
+}
+
+function showPage(page){
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('admin').classList.add('hidden');
+  document.getElementById('schedule').classList.add('hidden');
+  document.getElementById(page).classList.remove('hidden');
+  if(page==='schedule') showSchedule();
+  if(page==='admin') populateDropdowns();
+}
+
+function addCategory(){
+  let newCat=document.getElementById('newCategory').value;
+  if(newCat && !categories.includes(newCat)){
+    categories.push(newCat);
+    populateDropdowns();
+    document.getElementById('newCategory').value='';
+  }
+}
+
+function show(list){
+ const div=document.getElementById('list');
+ div.innerHTML='';
+ list.forEach(l=>{
+   div.innerHTML+=`<div class='card'><h4>${l.name}</h4><p><b>${l.from} → ${l.to}</b></p><p>Category: ${l.category}</p><p>🕒 ${l.time}</p><p>⏱ ${l.arrival}</p></div>`;
+ });
+}
+
+function showSchedule(){
+ const div=document.getElementById('scheduleList');
+ div.innerHTML='';
+ launches.forEach(l=>{
+   div.innerHTML+=`<div class='card'><h4>${l.name}</h4><p>${l.from} → ${l.to}</p><p>Category: ${l.category}</p><p>Departure: ${l.time}</p><p>Arrival: ${l.arrival}</p></div>`;
+ });
+}
+
+function showAdmin(){
+ const div=document.getElementById('adminList');
+ div.innerHTML='';
+ launches.forEach(l=>{
+   div.innerHTML+=`<div class='card'><h4>${l.name}</h4><p>${l.from} → ${l.to} (${l.category})</p><button onclick="removeLaunch(${l.id})">Delete</button></div>`;
+ });
+}
+
+function addLaunch(){
+ const name=document.getElementById('name').value;
+ const dest=document.getElementById('dest').value;
+ const fromLoc=document.getElementById('fromSelect').value;
+ const category=document.getElementById('categorySelect').value;
+ const time=document.getElementById('time').value;
+ const arrival=document.getElementById('arrival').value;
+ launches.push({id:Date.now(),name,from:fromLoc,to:dest,category,time,arrival});
+ show(launches);
+ showAdmin();
+}
+
+function login(){
+ const user=document.getElementById('username').value;
+ const pass=document.getElementById('password').value;
+ if(user===ADMIN_USER && pass===ADMIN_PASS){ alert('Login Success'); showPage('admin'); showAdmin(); } else alert('Wrong login');
+}
+
+function removeLaunch(id){
+ launches = launches.filter(l=>l.id!==id);
+ show(launches);
+ showAdmin();
+}
+
+function searchLaunch(){
+ const from=document.getElementById('from').value;
+ const to=document.getElementById('to').value;
+ if(from === '' && to === '') {
+   show(launches);
+ } else {
+   show(launches.filter(l=> (from === '' || l.from===from) && (to === '' || l.to===to)));
+ }
+}
+
+function filterSchedule(){
+ const value=document.getElementById('filter').value;
+ if(value==='all') show(launches);
+ else show(launches.filter(l=>l.to===value));
+}
+
+function updateFooter(){
+ const text=document.getElementById('footerTextInput').value;
+ if(text) document.getElementById('footerText').innerHTML=`Website designed by <span style=\"cursor:pointer;\" onclick=\"showPage('login')\">${text}</span>`;
+}
+
+function changeAdmin(){
+ const newUser=document.getElementById('newUsername').value;
+ const newPass=document.getElementById('newPassword').value;
+ if(newUser) ADMIN_USER=newUser;
+ if(newPass) ADMIN_PASS=newPass;
+ alert('Admin credentials updated');
+}
+
+populateDropdowns();
+show(launches);
+</script>
+
+</body>
+</html>
